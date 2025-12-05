@@ -57,6 +57,10 @@ public class Compressor {
 
     private void montaBinario() {
         for  (char c : this.texto.toCharArray()) {
+            // Forma correta binario
+            // this.binario += this.tabelaBinaria.getTabela().get(String.valueOf(c));
+
+            // Para fins didaticos
             this.binario += this.tabelaBinaria.getTabela().get(String.valueOf(c)) + " ";
         }
     }
