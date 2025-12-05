@@ -1,18 +1,10 @@
 package com.mycompany.huffman.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class TabelaCodificada {
-    private No raiz;
     private Map<String, String> tabela;
-
-    public No getRaiz() {
-        return raiz;
-    }
-
-    public void setRaiz(No raiz) {
-        this.raiz = raiz;
-    }
 
     public Map<String, String> getTabela() {
         return tabela;
@@ -22,13 +14,27 @@ public class TabelaCodificada {
         this.tabela = tabela;
     }
 
-    public TabelaCodificada(No raiz) {
-        this.raiz = raiz;
-        this.createTable();
+    public TabelaCodificada() {
+        this.tabela = new HashMap<>();
     }
 
-    private Map<String, String> createTable(){
-        System.out.println(raiz);
-        return null;
+    public TabelaCodificada(Arvore arvore) {
+        this.tabela = new HashMap<>();
+        this.createTable(arvore.getRaiz(), "");
+    }
+
+    private void createTable(No no, String prefixo) {
+        // Caso o nó não tenha filho
+        if (no == null) return;
+
+        // Quando chegar em uma folha
+        if (no.isFolha()) {
+            this.tabela.put(no.getCaracter(), prefixo);
+            return;
+        }
+
+        // Utiliza recursividade para gerar os filhos abaixo
+        createTable(no.getFilho_esquerdo(), prefixo + "0");
+        createTable(no.getFilho_direito(), prefixo + "1");
     }
 }
