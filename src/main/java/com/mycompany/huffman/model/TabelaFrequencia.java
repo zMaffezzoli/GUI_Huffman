@@ -3,16 +3,16 @@ package com.mycompany.huffman.model;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FrequencyTable {
+public class TabelaFrequencia {
     private String texto;
-    private Map<Character, Integer> table = new HashMap<>();
+    private Map<Character, Integer> tabela = new HashMap<>();
 
-    public Map<Character, Integer> getTable() {
-        return table;
+    public Map<Character, Integer> getTabela() {
+        return tabela;
     }
 
-    public void setTable(Map<Character, Integer> map) {
-        this.table = map;
+    public void setTabela(Map<Character, Integer> map) {
+        this.tabela = map;
     }
 
     public String getTexto() {
@@ -23,14 +23,14 @@ public class FrequencyTable {
         this.texto = texto;
     }
 
-    public FrequencyTable(String texto) {
+    public TabelaFrequencia(String texto) {
         this.texto = texto;
         this.createTable();
     }
 
     private void createTable() {
         for  (char c : this.texto.toCharArray()) {
-            table.put(c, table.getOrDefault(c, 0) + 1);
+            tabela.put(c, tabela.getOrDefault(c, 0) + 1);
         }
     }
 }
