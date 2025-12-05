@@ -1,16 +1,18 @@
 package com.mycompany.huffman.controller;
 
 import com.mycompany.huffman.model.HuffmanRow;
-import com.mycompany.huffman.util.*; // Importa seus TextReaders
+import com.mycompany.huffman.util.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import javafx.stage.FileChooser;
@@ -19,13 +21,11 @@ import java.io.File;
 
 public class MainController {
 
-    // Inputs
     @FXML private TabPane inputTabPane;
     @FXML private Tab tabText;
     @FXML private TextArea inputArea;
     @FXML private Label fileLabel;
 
-    // Tabelas
     @FXML private TableView<HuffmanRow> freqTable;
     @FXML private TableColumn<HuffmanRow, String> colSymbolFreq;
     @FXML private TableColumn<HuffmanRow, Integer> colFreq;
@@ -34,21 +34,90 @@ public class MainController {
     @FXML private TableColumn<HuffmanRow, String> colSymbolCode;
     @FXML private TableColumn<HuffmanRow, String> colCode;
 
-    // Output Binário
     @FXML private TextArea binaryOutput;
 
-    // Desenho
-    @FXML private Pane treePane;
+    // ÁREA DA ÁRVORE (MODIFICADO)
+    @FXML private StackPane treeViewport; // A janela fixa
+    @FXML private Pane treePane;          // O conteúdo que se move
 
     private File selectedFile;
 
+    // Variáveis para controle de arrastar (Pan)
+    private double mouseAnchorX;
+    private double mouseAnchorY;
+    private double translateAnchorX;
+    private double translateAnchorY;
+
     @FXML
     public void initialize() {
-        // Vincula as colunas com a classe HuffmanRow
         colSymbolFreq.setCellValueFactory(new PropertyValueFactory<>("symbol"));
         colFreq.setCellValueFactory(new PropertyValueFactory<>("frequency"));
         colSymbolCode.setCellValueFactory(new PropertyValueFactory<>("symbol"));
         colCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+
+        freqTable.setSelectionModel(null);
+        codeTable.setSelectionModel(null);
+
+        // --- CONFIGURAÇÃO DE ZOOM E PAN ---
+        setupZoomAndPan();
+    }
+
+    private void setupZoomAndPan() {
+        // 1. Clipping: Garante que a árvore não desenhe fora da caixa cinza
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(treeViewport.widthProperty());
+        clip.heightProperty().bind(treeViewport.heightProperty());
+        treeViewport.setClip(clip);
+
+        // 2. Lógica de Scroll (Zoom)
+        treeViewport.setOnScroll(event -> {
+            // VERIFICAÇÃO DO CTRL: Só executa se o Ctrl estiver segurado
+            if (event.isControlDown()) {
+                double zoomFactor = 1.05;
+                double deltaY = event.getDeltaY();
+
+                if (deltaY < 0) {
+                    zoomFactor = 1 / zoomFactor; // Zoom Out
+                }
+
+                // Aplica escala
+                treePane.setScaleX(treePane.getScaleX() * zoomFactor);
+                treePane.setScaleY(treePane.getScaleY() * zoomFactor);
+
+                event.consume(); // Marca como resolvido para não propagar
+            }
+        });
+
+        // 3. Lógica de Clique (Início do Arrastar)
+        treePane.setOnMousePressed(event -> {
+            mouseAnchorX = event.getSceneX();
+            mouseAnchorY = event.getSceneY();
+            translateAnchorX = treePane.getTranslateX();
+            translateAnchorY = treePane.getTranslateY();
+            treeViewport.setCursor(javafx.scene.Cursor.CLOSED_HAND); // Muda cursor
+        });
+
+        // 4. Lógica de Arrastar (Pan)
+        treePane.setOnMouseDragged(event -> {
+            treePane.setTranslateX(translateAnchorX + event.getSceneX() - mouseAnchorX);
+            treePane.setTranslateY(translateAnchorY + event.getSceneY() - mouseAnchorY);
+        });
+
+        // 5. Soltar o Mouse
+        treePane.setOnMouseReleased(event -> {
+            treeViewport.setCursor(javafx.scene.Cursor.DEFAULT);
+        });
+    }
+
+    @FXML
+    private void handleClearText() {
+        inputArea.clear();
+        inputArea.requestFocus();
+    }
+
+    @FXML
+    private void handlePasteExample() {
+        inputArea.setText("BANANA");
     }
 
     @FXML
@@ -62,12 +131,10 @@ public class MainController {
     @FXML
     private void handleProcess() {
         try {
-            // 1. LEITURA (Usando suas classes utilitárias)
             String text = "";
             if (inputTabPane.getSelectionModel().getSelectedItem() == tabText) {
                 text = inputArea.getText();
             } else if (selectedFile != null) {
-                // Polimorfismo aqui!
                 TextReader reader = new FileTextReader(selectedFile);
                 text = reader.readContent();
             }
@@ -77,36 +144,23 @@ public class MainController {
                 return;
             }
 
-            // ======================================================
-            // 2. SIMULAÇÃO DE DADOS (Aqui você plugará seu backend Huffman depois)
-            // ======================================================
+            binaryOutput.setText("10010101110 (Simulação para: " + text + ")");
 
-            // Simula resultado binário
-            binaryOutput.setText("10101000... (Simulação para: " + text + ")");
-
-            // Simula dados das tabelas
             ObservableList<HuffmanRow> data = FXCollections.observableArrayList(
-                    new HuffmanRow("A", 15, "0"),
-                    new HuffmanRow("B", 7, "101"),
-                    new HuffmanRow("C", 6, "110"),
-                    new HuffmanRow("D", 5, "111")
+                    new HuffmanRow("B", 1, "100"),
+                    new HuffmanRow("A", 3, "0"),
+                    new HuffmanRow("N", 2, "101")
             );
             freqTable.setItems(data);
             codeTable.setItems(data);
 
-            // Simula Árvore para Desenho
-            // Estrutura: Raiz(33) -> Esq: A(15) | Dir: Interno(18)
-            SimulatedNode nC = new SimulatedNode("C", 6, null, null);
-            SimulatedNode nD = new SimulatedNode("D", 5, null, null);
-            SimulatedNode nCD = new SimulatedNode(null, 11, nC, nD); // Soma C+D
+            // Simula Árvore
+            SimulatedNode nB = new SimulatedNode("B", 1, null, null);
+            SimulatedNode nN = new SimulatedNode("N", 2, null, null);
+            SimulatedNode nBN = new SimulatedNode(null, 3, nB, nN);
+            SimulatedNode nA = new SimulatedNode("A", 3, null, null);
+            SimulatedNode root = new SimulatedNode(null, 6, nA, nBN);
 
-            SimulatedNode nB = new SimulatedNode("B", 7, null, null);
-            SimulatedNode nRight = new SimulatedNode(null, 18, nB, nCD); // Soma B + (C+D)
-
-            SimulatedNode nA = new SimulatedNode("A", 15, null, null);
-            SimulatedNode root = new SimulatedNode(null, 33, nA, nRight); // Raiz
-
-            // 3. DESENHAR
             drawTree(root);
 
         } catch (Exception e) {
@@ -117,47 +171,41 @@ public class MainController {
 
     private void drawTree(SimulatedNode root) {
         treePane.getChildren().clear();
-        // Começa a desenhar no meio da tela (x=750, y=50) com espaçamento inicial de 300
-        if (root != null) {
-            drawTreeRecursive(root, 750, 50, 200);
-        }
+        // Reseta posição e zoom ao gerar nova árvore
+        treePane.setTranslateX(0);
+        treePane.setTranslateY(0);
+        treePane.setScaleX(1);
+        treePane.setScaleY(1);
+
+        if (root != null) drawTreeRecursive(root, 0, 50, 200); // Começa no 0,0 do pane
     }
 
     private void drawTreeRecursive(SimulatedNode node, double x, double y, double hGap) {
-        // Se tiver filho esquerdo
         if (node.left != null) {
             double childX = x - hGap;
             double childY = y + 100;
-
             Line line = new Line(x, y, childX, childY);
             line.setStroke(Color.GRAY);
             line.setStrokeWidth(2);
             treePane.getChildren().add(line);
-
             drawTreeRecursive(node.left, childX, childY, hGap * 0.6);
         }
 
-        // Se tiver filho direito
         if (node.right != null) {
             double childX = x + hGap;
             double childY = y + 100;
-
             Line line = new Line(x, y, childX, childY);
             line.setStroke(Color.GRAY);
             line.setStrokeWidth(2);
             treePane.getChildren().add(line);
-
             drawTreeRecursive(node.right, childX, childY, hGap * 0.6);
         }
 
-        // Desenha a "Bola" do nó
         Circle circle = new Circle(x, y, 25);
-        // Azul escuro para nós internos, Vermelho para folhas
         circle.setFill(node.character == null ? Color.web("#34495e") : Color.web("#e74c3c"));
         circle.setStroke(Color.BLACK);
         circle.setStrokeWidth(2);
 
-        // Texto dentro da bola (Caractere e Frequência)
         String label = (node.character == null ? "" : node.character + "\n") + node.frequency;
         Text text = new Text(label);
         text.setBoundsType(TextBoundsType.VISUAL);
@@ -165,24 +213,15 @@ public class MainController {
         text.setY(y + 5);
         text.setFill(Color.WHITE);
         text.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
-        if (node.character != null) text.setY(y); // Ajuste fino se tiver texto
+        if (node.character != null) text.setY(y);
 
-        // Importante: Adiciona o círculo e o texto POR ÚLTIMO para ficarem em cima das linhas
         treePane.getChildren().addAll(circle, text);
     }
 
-    // Classe interna estática para simular os nós (Use sua HuffmanNode aqui no futuro)
     public static class SimulatedNode {
-        String character;
-        int frequency;
-        SimulatedNode left;
-        SimulatedNode right;
-
+        String character; int frequency; SimulatedNode left; SimulatedNode right;
         public SimulatedNode(String c, int f, SimulatedNode l, SimulatedNode r) {
-            this.character = c;
-            this.frequency = f;
-            this.left = l;
-            this.right = r;
+            this.character = c; this.frequency = f; this.left = l; this.right = r;
         }
     }
 }
