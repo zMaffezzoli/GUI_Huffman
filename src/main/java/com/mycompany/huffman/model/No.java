@@ -47,7 +47,7 @@ public class No implements Comparable<No>{
         this.filho_esquerdo = filho_esquerdo;
         this.filho_direito = filho_direito;
         this.frequencia = filho_direito.frequencia +  filho_esquerdo.frequencia;
-        this.caracter = filho_esquerdo.caracter + " + " + filho_direito.caracter;
+        this.caracter = filho_esquerdo.caracter + "+" + filho_direito.caracter;
     }
 
     // Checa se é uma folha (Metodo somente para visualização teste)
