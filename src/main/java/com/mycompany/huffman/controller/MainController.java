@@ -144,7 +144,7 @@ public class MainController {
     @FXML
     private void handleProcess() {
         try {
-            // 1. Obter o texto da aba correta
+            // 1. Obter o texto da aba selecionada
             String text = "";
             if (inputTabPane.getSelectionModel().getSelectedItem() == tabText) {
                 text = inputArea.getText();
@@ -159,30 +159,47 @@ public class MainController {
                 return;
             }
 
-            // 2. BACKEND: Instancia sua classe Compressor (que gera tudo)
+            // 2. BACKEND: Gera a árvore e as tabelas
             Compressor compressor = new Compressor(text);
 
-            // 3. Exibir o resultado Binário na tela
+            // 3. Exibir o resultado Binário
             binaryOutput.setText(compressor.getBinario());
 
-            // 4. Popular as tabelas (Cruzando Frequência com Código Binário)
+            // 4. PREPARAR DADOS PARA AS TABELAS
             ObservableList<HuffmanRow> tableData = FXCollections.observableArrayList();
 
             Map<Character, Integer> freqMap = compressor.getTabelaFrequencia().getTabela();
             Map<String, String> binaryMap = compressor.getTabelaBinaria().getTabela();
 
+            // Popula a lista inicial
             for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
                 String symbol = String.valueOf(entry.getKey());
                 Integer frequency = entry.getValue();
-
-                // Pega o código binário correspondente ao símbolo
                 String code = binaryMap.get(symbol);
 
                 tableData.add(new HuffmanRow(symbol, frequency, code));
             }
 
+            // --- ORDENAÇÃO UNIFICADA ---
+            // Como as duas tabelas devem ter a mesma ordem, ordenamos a lista única uma vez.
+            tableData.sort((r1, r2) -> {
+                // 1. Compara Quantidade (Do MAIOR para o MENOR)
+                // Usamos r2.getFrequency() primeiro para ordem decrescente
+                int freqCompare = Integer.compare(r2.getFrequency(), r1.getFrequency());
+
+                // Se a quantidade for diferente, já retorna quem ganha
+                if (freqCompare != 0) {
+                    return freqCompare;
+                }
+
+                // 2. Critério de Desempate: Ordem Alfabética (A -> Z)
+                return r1.getSymbol().compareTo(r2.getSymbol());
+            });
+
+            // Aplica a MESMA lista ordenada para as DUAS tabelas
             freqTable.setItems(tableData);
             codeTable.setItems(tableData);
+
 
             // 5. Desenhar a Árvore Visual
             if (compressor.getArvore() != null) {
