@@ -13,7 +13,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -24,6 +24,8 @@ import javafx.scene.text.FontWeight;
 
 import java.io.File;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainController {
 
@@ -224,65 +226,69 @@ public class MainController {
         treePane.setScaleY(1);
 
         if (root != null) {
-            // --- CÁLCULO DINÂMICO DE ESPAÇAMENTO ---
-            int profundidade = getAlturaArvore(root);
+            // 1. MAPA DE COORDENADAS
+            // Vamos guardar a posição X calculada de cada nó aqui
+            Map<No, Double> xPositions = new HashMap<>();
 
-            // Lógica: Cada nó folha precisa de uns 70px de espaço mínimo (largura da cápsula + margem).
-            // A largura inicial necessária é: 70 * 2^(profundidade - 2)
-            // Isso garante que, ao dividir por 2 várias vezes, o último nível ainda tenha ~70px.
+            // Um contador para saber em qual "coluna" estamos desenhando a próxima folha
+            AtomicInteger leafIndex = new AtomicInteger(0);
 
-            double espacoMinimoFolha = 75.0;
-            double initialGap = espacoMinimoFolha * Math.pow(2, Math.max(1, profundidade - 2));
+            // Distância fixa entre cada folha (Isso define a largura da árvore)
+            double leafSpacing = 85.0;
 
-            // Inicia o desenho com o gap calculado
-            drawTreeRecursive(root, 0, 50, initialGap);
+            // Calcula matematicamente onde cada nó deve ficar
+            calculatePositions(root, xPositions, leafIndex, leafSpacing);
+
+            // 2. DESENHO
+            // Agora desenhamos usando as coordenadas exatas do mapa.
+            // O Y continua sendo calculado por nível (nível * 100)
+
+            // Centraliza a raiz na tela inicialmente (opcional, mas ajuda)
+            double rootX = xPositions.get(root);
+            treePane.setTranslateX(-rootX + 400); // Tenta jogar a raiz pro meio da tela
+
+            drawTreeRecursive(root, 50, xPositions);
         }
     }
 
-    private void drawTreeRecursive(No node, double x, double y, double hGap) {
-        // --- 1. Desenha as Linhas (Arestas) ---
-        double nextGap = hGap * 0.5;
+    // Agora recebe o Map de posições pré-calculadas
+    private void drawTreeRecursive(No node, double y, Map<No, Double> xPositions) {
+        // Pega a posição X calculada para este nó
+        double x = xPositions.get(node);
 
-        // Altura fixa da cápsula (usada para calcular onde a linha conecta)
-        double capsuleHeight = 52;
-
+        // --- 1. Desenha as Linhas ---
         if (node.getFilho_esquerdo() != null) {
-            double childX = x - hGap;
+            double childX = xPositions.get(node.getFilho_esquerdo());
             double childY = y + 100;
 
-            // Ajuste: A linha sai do centro inferior da cápsula atual
-            // e vai até o centro superior da cápsula filha
-            Line line = new Line(x, y + (capsuleHeight/2), childX, childY - (capsuleHeight/2));
+            // Linha saindo do centro da cápsula (altura 52)
+            Line line = new Line(x, y + 26, childX, childY - 26);
             line.setStroke(Color.GRAY);
             line.setStrokeWidth(2);
             line.toBack();
             treePane.getChildren().add(line);
 
-            drawTreeRecursive(node.getFilho_esquerdo(), childX, childY, nextGap);
+            drawTreeRecursive(node.getFilho_esquerdo(), childY, xPositions);
         }
 
         if (node.getFilho_direito() != null) {
-            double childX = x + hGap;
+            double childX = xPositions.get(node.getFilho_direito());
             double childY = y + 100;
 
-            Line line = new Line(x, y + (capsuleHeight/2), childX, childY - (capsuleHeight/2));
+            Line line = new Line(x, y + 26, childX, childY - 26);
             line.setStroke(Color.GRAY);
             line.setStrokeWidth(2);
             line.toBack();
             treePane.getChildren().add(line);
 
-            drawTreeRecursive(node.getFilho_direito(), childX, childY, nextGap);
+            drawTreeRecursive(node.getFilho_direito(), childY, xPositions);
         }
 
-        // --- 2. Configura o Texto ---
+        // --- 2. Cria a Cápsula (Igual ao anterior) ---
+
+        // Texto
         String rawChar = node.getCaracter() == null ? "" : node.getCaracter();
-
-        // Sanitização (Enter, Tab, etc)
-        String charText = rawChar
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
-
+        String charText = rawChar.replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
         String freqText = String.valueOf(node.getFrequencia());
         String fullLabel = charText + "\n" + freqText;
 
@@ -293,20 +299,20 @@ public class MainController {
         text.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
         text.setWrappingWidth(0);
 
-        // --- 3. Cria a Cápsula ---
+        // Dimensões
+        double fixedHeight = 52;
         double textWidth = text.getLayoutBounds().getWidth();
-        // Largura dinâmica (mínimo 52, ou tamanho do texto + 30px de margem)
-        double capsuleWidth = Math.max(capsuleHeight, textWidth + 30);
+        double capsuleWidth = Math.max(fixedHeight, textWidth + 30);
 
         Rectangle capsule = new Rectangle();
         capsule.setWidth(capsuleWidth);
-        capsule.setHeight(capsuleHeight);
-        capsule.setArcWidth(capsuleHeight);
-        capsule.setArcHeight(capsuleHeight);
+        capsule.setHeight(fixedHeight);
+        capsule.setArcWidth(fixedHeight);
+        capsule.setArcHeight(fixedHeight);
 
-        // Centraliza
+        // Posiciona (X vem do mapa, Y vem do parametro recursivo)
         capsule.setX(x - (capsuleWidth / 2));
-        capsule.setY(y - (capsuleHeight / 2));
+        capsule.setY(y - (fixedHeight / 2));
 
         // Cores
         boolean isLeaf = node.isFolha();
@@ -314,18 +320,37 @@ public class MainController {
         capsule.setStroke(Color.BLACK);
         capsule.setStrokeWidth(2);
 
-        // --- 4. Posiciona o Texto ---
+        // Texto Centralizado
         text.setX(x - (textWidth / 2));
         text.setY(y + text.getLayoutBounds().getHeight() / 4);
 
         treePane.getChildren().addAll(capsule, text);
     }
 
-    // Metodo auxiliar para calcular a profundidade da arvore
-    private int getAlturaArvore(No node) {
-        if (node == null) return 0;
-        int esquerda = getAlturaArvore(node.getFilho_esquerdo());
-        int direita = getAlturaArvore(node.getFilho_direito());
-        return Math.max(esquerda, direita) + 1;
+    // Método recursivo que define o X de cada nó (Bottom-Up)
+    private void calculatePositions(No node, Map<No, Double> xPositions, AtomicInteger leafIndex, double spacing) {
+        if (node == null) return;
+
+        // Se for folha, ela ganha a próxima posição disponível na fila
+        if (node.isFolha()) {
+            double x = leafIndex.getAndIncrement() * spacing;
+            xPositions.put(node, x);
+        } else {
+            // Se não for folha, processa os filhos primeiro
+            calculatePositions(node.getFilho_esquerdo(), xPositions, leafIndex, spacing);
+            calculatePositions(node.getFilho_direito(), xPositions, leafIndex, spacing);
+
+            // A posição do Pai é exatamente no meio dos filhos
+            double leftX = xPositions.containsKey(node.getFilho_esquerdo()) ?
+                    xPositions.get(node.getFilho_esquerdo()) : 0;
+
+            double rightX = xPositions.containsKey(node.getFilho_direito()) ?
+                    xPositions.get(node.getFilho_direito()) : leftX;
+
+            // Se tiver os dois filhos, fica no meio. Se tiver só um, fica em cima dele.
+            double myX = (leftX + rightX) / 2.0;
+            xPositions.put(node, myX);
+        }
     }
 }
+
