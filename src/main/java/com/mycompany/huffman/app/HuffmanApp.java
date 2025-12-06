@@ -7,13 +7,19 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class HuffmanApp extends Application {
-
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/input.fxml"));
+        // Carrega o FXML
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/main_screen.fxml"));
+        Scene scene = new Scene(root);
 
-        stage.setScene(new Scene(root));
-        stage.setTitle("App Huffman");
+        // ADICIONA O CSS (Atualizado para a pasta styles)
+        String css = getClass().getResource("/styles/application.css").toExternalForm();
+        scene.getStylesheets().add(css);
+
+        stage.setTitle("Huffman Studio Pro");
+        stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
 
