@@ -1,9 +1,9 @@
 package com.mycompany.huffman.util;
 
-public class StringTextReader extends TextReader {
+public class LeitorString extends Leitor {
     private final String content;
 
-    public StringTextReader(String content) {
+    public LeitorString(String content) {
         this.content = content;
     }
 

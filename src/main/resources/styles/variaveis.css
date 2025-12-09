@@ -1,0 +1,18 @@
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", Helvetica, sans-serif;
+    -fx-background-color: #f4f6f8;
+}
+
+.root-scroll {
+    -fx-background-color: transparent;
+}
+
+.root-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.main-container {
+    -fx-spacing: 20;
+    -fx-padding: 30;
+    -fx-background-color: #f4f6f8;
+}

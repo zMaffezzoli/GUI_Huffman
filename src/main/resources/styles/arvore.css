@@ -1,0 +1,16 @@
+.tree-container {
+    -fx-spacing: 10;
+}
+
+/* Janela fixa */
+.tree-viewport {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 4;
+    -fx-pref-height: 500;
+    -fx-cursor: open_hand; /* Cursor para mostrar animação de arrasto */
+}
+
+.tree-canvas {
+    -fx-background-color: transparent;
+}

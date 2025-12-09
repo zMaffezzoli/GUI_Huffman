@@ -3,10 +3,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class FileTextReader extends TextReader {
+public class LeitorArquivo extends Leitor {
     private final File file;
 
-    public FileTextReader(File file) {
+    public LeitorArquivo(File file) {
         this.file = file;
     }
 

@@ -2,17 +2,18 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
 <ScrollPane fitToWidth="true" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.mycompany.huffman.controller.MainController"
+            fx:controller="com.mycompany.huffman.controller.MainControlador"
             styleClass="root-scroll">
     <content>
         <VBox styleClass="main-container">
 
-            <Label text="Huffman Compressor Pro" styleClass="app-title"/>
+            <Label text="Compressor de Huffman" styleClass="app-title"/>
 
             <TabPane fx:id="inputTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="input-tab-pane">
+
+                <!-- Quadrado para escrever -->
                 <Tab fx:id="tabText" text="Digitar Texto">
                     <VBox styleClass="tab-content">
                         <TextArea fx:id="inputArea" promptText="Digite o texto aqui..." wrapText="true" styleClass="input-text-area"/>
@@ -22,6 +23,8 @@
                         </HBox>
                     </VBox>
                 </Tab>
+
+                <!-- Área para carregar arquivo -->
                 <Tab fx:id="tabFile" text="Carregar Arquivo">
                     <HBox styleClass="tab-content-file">
                         <Button text="Selecionar Arquivo .txt" onAction="#handleSelectFile" styleClass="btn-secondary"/>
@@ -30,10 +33,12 @@
                 </Tab>
             </TabPane>
 
+            <!-- Botão para chamar as funções -->
             <HBox styleClass="action-container">
                 <Button text="COMPRIMIR E GERAR ÁRVORE" onAction="#handleProcess" styleClass="btn-primary"/>
             </HBox>
 
+            <!-- Tabela frequencia -->
             <HBox styleClass="data-container">
                 <VBox styleClass="column-container" HBox.hgrow="ALWAYS">
                     <Label text="Frequências" styleClass="section-subtitle"/>
@@ -46,6 +51,7 @@
                     </TableView>
                 </VBox>
 
+                <!-- Tabela codigos -->
                 <VBox styleClass="column-container" HBox.hgrow="ALWAYS">
                     <Label text="Códigos Gerados" styleClass="section-subtitle"/>
                     <TableView fx:id="codeTable" styleClass="modern-table" VBox.vgrow="ALWAYS">
@@ -57,18 +63,21 @@
                     </TableView>
                 </VBox>
 
+
                 <VBox styleClass="column-container" HBox.hgrow="ALWAYS">
                     <Label text="Resultado Final" styleClass="section-subtitle"/>
                     <TextArea fx:id="binaryOutput" editable="false" wrapText="true" styleClass="output-area" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </HBox>
 
+            <!-- Textos adicionais -->
             <VBox styleClass="tree-container">
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Visualização da Árvore" styleClass="section-title"/>
                     <Label text="(Arraste para mover, Ctrl + Scroll para zoom)" style="-fx-font-size: 11px; -fx-text-fill: #95a5a6;"/>
                 </HBox>
 
+                <!-- Onde desenha a árvore -->
                 <StackPane fx:id="treeViewport" styleClass="tree-viewport">
                     <Pane fx:id="treePane" styleClass="tree-canvas"/>
                 </StackPane>

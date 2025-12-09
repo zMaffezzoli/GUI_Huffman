@@ -1,0 +1,53 @@
+.input-tab-pane {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #dfe6e9;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 2);
+}
+
+.input-tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+/* Estilo do painel */
+.input-tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-padding: 10 20;
+    -fx-text-fill: #636e72;
+    -fx-font-weight: normal;
+    -fx-border-color: transparent transparent #dfe6e9 transparent;
+    -fx-cursor: hand; /* Troca o cursor */
+}
+
+.input-tab-pane .tab:selected {
+    -fx-text-fill: #2980b9;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent transparent #2980b9 transparent;
+    -fx-border-width: 3;
+    -fx-cursor: hand; /* Troca o cursor */
+}
+
+.tab-content {
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+
+.tab-content-file {
+    -fx-padding: 30;
+    -fx-spacing: 15;
+    -fx-alignment: center-left;
+}
+
+.input-text-area {
+    -fx-pref-height: 100;
+    -fx-font-size: 14px;
+    -fx-background-color: #fafafa;
+    -fx-border-color: #ecf0f1;
+    -fx-border-radius: 4;
+}
+
+.input-text-area:focused {
+    -fx-background-color: white;
+    -fx-border-color: #3498db;
+}
