@@ -2,7 +2,6 @@ package com.mycompany.huffman.model;
 
 import org.junit.jupiter.api.Test;
 
-
 public class TabelaBinariaTeste {
 
     @Test
