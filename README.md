@@ -49,6 +49,14 @@ com.mycompany.huffman
 
 ---
 
+## Diagrama UML
+Abaixo está o diagrama UML que representa a estrutura do projeto.
+```markdown
+![Diagrama UML](./documents/DiagramaUML.png)
+```
+
+---
+
 ##  Como Executar o Projeto
 ### Pré‑requisitos
 - Java 21 instalado
