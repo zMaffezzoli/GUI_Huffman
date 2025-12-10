@@ -2,7 +2,7 @@ package com.mycompany.huffman.model;
 
 import org.junit.jupiter.api.Test;
 
-public class VisualizacaoArvoreTeste {
+public class VisualizacaoArvore {
 
     public void printArvore(No node) {
         printArvore(node, "", true);
@@ -27,7 +27,11 @@ public class VisualizacaoArvoreTeste {
         TabelaFrequencia tabela = new TabelaFrequencia("Pindamonhangaba");
         Arvore arvore = new Arvore(tabela);
 
-        System.out.println("Árvore de Huffman:");
+        System.out.println("\nTexto original " + tabela.getTexto());
+        System.out.println("\nÁrvore de Huffman:");
+
         printArvore(arvore.getRaiz());
+
+        System.out.println("\n");
     }
 }
