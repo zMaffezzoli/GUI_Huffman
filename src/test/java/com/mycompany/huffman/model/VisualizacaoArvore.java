@@ -18,8 +18,8 @@ public class VisualizacaoArvore {
         // prefixo dos filhos
         String childPrefix = prefix + (isLeft ? "    " : "│   ");
 
-        printArvore(no.getFilho_esquerdo(), childPrefix, false);
-        printArvore(no.getFilho_direito(), childPrefix, true);
+        printArvore(no.getFilhoEsquerdo(), childPrefix, false);
+        printArvore(no.getFilhoDireito(), childPrefix, true);
     }
 
     @Test

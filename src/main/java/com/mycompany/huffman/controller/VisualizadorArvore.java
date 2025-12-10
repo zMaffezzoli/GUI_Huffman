@@ -88,13 +88,13 @@ public class VisualizadorArvore {
         double x = xPositions.get(node);
 
         // Desenha as linhas para os filhos
-        if (node.getFilho_esquerdo() != null) {
-            drawConnection(x, y, xPositions.get(node.getFilho_esquerdo()), y + 100);
-            drawTreeRecursive(node.getFilho_esquerdo(), y + 100, xPositions);
+        if (node.getFilhoEsquerdo() != null) {
+            drawConnection(x, y, xPositions.get(node.getFilhoEsquerdo()), y + 100);
+            drawTreeRecursive(node.getFilhoEsquerdo(), y + 100, xPositions);
         }
-        if (node.getFilho_direito() != null) {
-            drawConnection(x, y, xPositions.get(node.getFilho_direito()), y + 100);
-            drawTreeRecursive(node.getFilho_direito(), y + 100, xPositions);
+        if (node.getFilhoDireito() != null) {
+            drawConnection(x, y, xPositions.get(node.getFilhoDireito()), y + 100);
+            drawTreeRecursive(node.getFilhoDireito(), y + 100, xPositions);
         }
 
         drawNodeContent(node, x, y);
@@ -166,12 +166,12 @@ public class VisualizadorArvore {
             xPositions.put(node, x);
         } else {
             // Recursividade para os nós filhos
-            calculatePositions(node.getFilho_esquerdo(), xPositions, leafIndex, spacing);
-            calculatePositions(node.getFilho_direito(), xPositions, leafIndex, spacing);
+            calculatePositions(node.getFilhoEsquerdo(), xPositions, leafIndex, spacing);
+            calculatePositions(node.getFilhoDireito(), xPositions, leafIndex, spacing);
 
-            double leftX = xPositions.getOrDefault(node.getFilho_esquerdo(), 0.0);
-            double rightX = xPositions.containsKey(node.getFilho_direito()) ?
-                    xPositions.get(node.getFilho_direito()) : leftX;
+            double leftX = xPositions.getOrDefault(node.getFilhoEsquerdo(), 0.0);
+            double rightX = xPositions.containsKey(node.getFilhoDireito()) ?
+                    xPositions.get(node.getFilhoDireito()) : leftX;
 
             xPositions.put(node, (leftX + rightX) / 2.0);
         }

@@ -34,7 +34,7 @@ public class TabelaBinaria {
         }
 
         // Utiliza recursividade para gerar os filhos abaixo
-        createTable(no.getFilho_esquerdo(), prefixo + "0");
-        createTable(no.getFilho_direito(), prefixo + "1");
+        createTable(no.getFilhoEsquerdo(), prefixo + "0");
+        createTable(no.getFilhoDireito(), prefixo + "1");
     }
 }

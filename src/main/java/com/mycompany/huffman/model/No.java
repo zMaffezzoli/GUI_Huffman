@@ -3,8 +3,8 @@ package com.mycompany.huffman.model;
 public class No implements Comparable<No>{
     private String caracter;
     private Integer frequencia;
-    private No filho_esquerdo;
-    private No filho_direito;
+    private No filhoEsquerdo;
+    private No filhoDireito;
 
     public String getCaracter() {
         return caracter;
@@ -14,20 +14,20 @@ public class No implements Comparable<No>{
         this.caracter = caracter;
     }
 
-    public No getFilho_direito() {
-        return filho_direito;
+    public No getFilhoDireito() {
+        return filhoDireito;
     }
 
-    public void setFilho_direito(No filho_direito) {
-        this.filho_direito = filho_direito;
+    public void setFilhoDireito(No filhoDireito) {
+        this.filhoDireito = filhoDireito;
     }
 
-    public No getFilho_esquerdo() {
-        return filho_esquerdo;
+    public No getFilhoEsquerdo() {
+        return filhoEsquerdo;
     }
 
-    public void setFilho_esquerdo(No filho_esquerdo) {
-        this.filho_esquerdo = filho_esquerdo;
+    public void setFilhoEsquerdo(No filhoEsquerdo) {
+        this.filhoEsquerdo = filhoEsquerdo;
     }
 
     public Integer getFrequencia() {
@@ -43,16 +43,16 @@ public class No implements Comparable<No>{
         this.frequencia = frequencia;
     }
 
-    public No(No filho_esquerdo, No filho_direito) {
-        this.filho_esquerdo = filho_esquerdo;
-        this.filho_direito = filho_direito;
-        this.frequencia = filho_direito.frequencia +  filho_esquerdo.frequencia;
-        this.caracter = filho_esquerdo.caracter + "+" + filho_direito.caracter;
+    public No(No filhoEsquerdo, No filhoDireito) {
+        this.filhoEsquerdo = filhoEsquerdo;
+        this.filhoDireito = filhoDireito;
+        this.frequencia = filhoDireito.frequencia +  filhoEsquerdo.frequencia;
+        this.caracter = filhoEsquerdo.caracter + "+" + filhoDireito.caracter;
     }
 
     // Checa se é uma folha (Metodo somente para visualização teste)
     public boolean isFolha() {
-        return this.filho_direito == null && this.filho_esquerdo == null;
+        return this.filhoDireito == null && this.filhoEsquerdo == null;
     }
 
     @Override

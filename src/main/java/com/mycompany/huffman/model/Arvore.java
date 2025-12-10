@@ -28,10 +28,10 @@ public class Arvore {
         // Realiza essa recursividade até que a arvore esteja completamente realizada
         // Restando apenas o nó raiz, contendo TODOS os outros nós (já na frequencia correta)
         while (fila.size() > 1) {
-            No filho_esquerdo = fila.poll();   // menor frequência da lista
-            No filho_direito = fila.poll();  // segunda menor frequencia (nesse nó, sendo a maior frequencia)
+            No filhoEsquerdo = fila.poll();   // menor frequência da lista
+            No filhoDireito = fila.poll();  // segunda menor frequencia (nesse nó, sendo a maior frequencia)
 
-            No pai = new No(filho_esquerdo=filho_esquerdo, filho_direito=filho_direito);
+            No pai = new No(filhoEsquerdo=filhoEsquerdo, filhoDireito=filhoDireito);
             fila.add(pai);
         }
 
