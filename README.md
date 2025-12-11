@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>Compressor Huffman</h1>
+    <h1>Compressor de Huffman</h1>
 </div>
 
 Este projeto implementa o **Algoritmo de Huffman** em Java, com uma interface gráfica desenvolvida em **JavaFX** para visualização da Árvore de Huffman.
