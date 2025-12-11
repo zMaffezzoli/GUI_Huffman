@@ -123,7 +123,7 @@ public class VisualizadorArvore {
 
         // Tratamento dos caracteres especiais para exibição
         String textoCaracter = caracterBruto.replace("\n", "\\n").replace("\r", "\\r")
-                .replace("\t", "\\t").replace(" ", "espaço");
+                .replace("\t", "\\t").replace(" ", "space");
 
         String rotuloCompleto = textoCaracter + "\n" + no.getFrequencia();
 
@@ -131,7 +131,7 @@ public class VisualizadorArvore {
         texto.setBoundsType(TextBoundsType.VISUAL);
 
         // Verifica se é espaço para estilização personalizada
-        if (no.isFolha() && textoCaracter.equals("espaço")) {
+        if (no.isFolha() && textoCaracter.equals("space")) {
             texto.setFont(Font.font("System", FontWeight.BOLD, FontPosture.ITALIC, 13));
         } else {
             texto.setFont(Font.font("System", FontWeight.BOLD, 13));
