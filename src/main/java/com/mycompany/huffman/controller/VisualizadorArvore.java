@@ -17,163 +17,174 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class VisualizadorArvore {
-    private final Pane treePane;
-    private final StackPane treeViewport;
+    private final Pane painelArvore;
+    private final StackPane viewportArvore;
 
-    // Controle do painel
-    private double mouseAnchorX, mouseAnchorY;
-    private double translateAnchorX, translateAnchorY;
+    // Controle do painel (Zoom e Arrastar)
+    private double mouseAncoraX, mouseAncoraY;
+    private double translacaoAncoraX, translacaoAncoraY;
 
-    public VisualizadorArvore(Pane treePane, StackPane treeViewport) {
-        this.treePane = treePane;
-        this.treeViewport = treeViewport;
-        setupZoomAndPan();
+    public VisualizadorArvore(Pane painelArvore, StackPane viewportArvore) {
+        this.painelArvore = painelArvore;
+        this.viewportArvore = viewportArvore;
+        configurarZoomEArrastar();
     }
 
-    private void setupZoomAndPan() {
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(treeViewport.widthProperty());
-        clip.heightProperty().bind(treeViewport.heightProperty());
-        treeViewport.setClip(clip);
+    private void configurarZoomEArrastar() {
+        // Define a área de recorte para que a árvore não saia do quadrado visual
+        Rectangle recorte = new Rectangle();
+        recorte.widthProperty().bind(viewportArvore.widthProperty());
+        recorte.heightProperty().bind(viewportArvore.heightProperty());
+        viewportArvore.setClip(recorte);
 
-        treeViewport.setOnScroll(event -> {
-            if (event.isControlDown()) {
-                event.consume();
-                double deltaY = event.getDeltaY();
+        // Zoom com Scroll + Ctrl
+        viewportArvore.setOnScroll(evento -> {
+            if (evento.isControlDown()) {
+                evento.consume();
+                double deltaY = evento.getDeltaY();
                 if (deltaY == 0) return;
-                double zoomFactor = (deltaY > 0) ? 1.1 : 0.9;
-                treePane.setScaleX(treePane.getScaleX() * zoomFactor);
-                treePane.setScaleY(treePane.getScaleY() * zoomFactor);
+
+                double fatorZoom = (deltaY > 0) ? 1.1 : 0.9;
+                painelArvore.setScaleX(painelArvore.getScaleX() * fatorZoom);
+                painelArvore.setScaleY(painelArvore.getScaleY() * fatorZoom);
             }
         });
 
-        treePane.setOnMousePressed(event -> {
-            mouseAnchorX = event.getSceneX();
-            mouseAnchorY = event.getSceneY();
-            translateAnchorX = treePane.getTranslateX();
-            translateAnchorY = treePane.getTranslateY();
-            treeViewport.setCursor(javafx.scene.Cursor.CLOSED_HAND);
+        // Clique inicial para arrastar
+        painelArvore.setOnMousePressed(evento -> {
+            mouseAncoraX = evento.getSceneX();
+            mouseAncoraY = evento.getSceneY();
+            translacaoAncoraX = painelArvore.getTranslateX();
+            translacaoAncoraY = painelArvore.getTranslateY();
+            viewportArvore.setCursor(javafx.scene.Cursor.CLOSED_HAND);
         });
 
-        treePane.setOnMouseDragged(event -> {
-            treePane.setTranslateX(translateAnchorX + event.getSceneX() - mouseAnchorX);
-            treePane.setTranslateY(translateAnchorY + event.getSceneY() - mouseAnchorY);
+        // Movimento de arrastar
+        painelArvore.setOnMouseDragged(evento -> {
+            painelArvore.setTranslateX(translacaoAncoraX + evento.getSceneX() - mouseAncoraX);
+            painelArvore.setTranslateY(translacaoAncoraY + evento.getSceneY() - mouseAncoraY);
         });
 
-        treePane.setOnMouseReleased(event -> treeViewport.setCursor(javafx.scene.Cursor.DEFAULT));
+        // Soltar o mouse
+        painelArvore.setOnMouseReleased(evento -> viewportArvore.setCursor(javafx.scene.Cursor.DEFAULT));
     }
 
-    public void drawTree(No root) {
-        treePane.getChildren().clear();
-        treePane.setTranslateX(0);
-        treePane.setTranslateY(0);
-        treePane.setScaleX(1);
-        treePane.setScaleY(1);
+    public void desenharArvore(No raiz) {
+        painelArvore.getChildren().clear();
+        painelArvore.setTranslateX(0);
+        painelArvore.setTranslateY(0);
+        painelArvore.setScaleX(1);
+        painelArvore.setScaleY(1);
 
-        if (root != null) {
-            Map<No, Double> xPositions = new HashMap<>();
-            AtomicInteger leafIndex = new AtomicInteger(0);
-            double leafSpacing = 85.0;
+        if (raiz != null) {
+            Map<No, Double> posicoesX = new HashMap<>();
+            AtomicInteger indiceFolha = new AtomicInteger(0);
+            double espacamentoFolha = 85.0;
 
-            calculatePositions(root, xPositions, leafIndex, leafSpacing);
+            calcularPosicoes(raiz, posicoesX, indiceFolha, espacamentoFolha);
 
-            double rootX = xPositions.get(root);
-            treePane.setTranslateX(-rootX + 400);
+            double raizX = posicoesX.get(raiz);
+            // Centraliza a raiz inicialmente (ajuste manual de offset se necessário)
+            painelArvore.setTranslateX(-raizX + 400);
 
-            drawTreeRecursive(root, 50, xPositions);
+            desenharArvoreRecursivo(raiz, 50, posicoesX);
         }
     }
 
-    private void drawTreeRecursive(No node, double y, Map<No, Double> xPositions) {
-        double x = xPositions.get(node);
+    private void desenharArvoreRecursivo(No no, double y, Map<No, Double> posicoesX) {
+        double x = posicoesX.get(no);
 
         // Desenha as linhas para os filhos
-        if (node.getFilhoEsquerdo() != null) {
-            drawConnection(x, y, xPositions.get(node.getFilhoEsquerdo()), y + 100);
-            drawTreeRecursive(node.getFilhoEsquerdo(), y + 100, xPositions);
+        if (no.getFilhoEsquerdo() != null) {
+            desenharConexao(x, y, posicoesX.get(no.getFilhoEsquerdo()), y + 100);
+            desenharArvoreRecursivo(no.getFilhoEsquerdo(), y + 100, posicoesX);
         }
-        if (node.getFilhoDireito() != null) {
-            drawConnection(x, y, xPositions.get(node.getFilhoDireito()), y + 100);
-            drawTreeRecursive(node.getFilhoDireito(), y + 100, xPositions);
+        if (no.getFilhoDireito() != null) {
+            desenharConexao(x, y, posicoesX.get(no.getFilhoDireito()), y + 100);
+            desenharArvoreRecursivo(no.getFilhoDireito(), y + 100, posicoesX);
         }
 
-        drawNodeContent(node, x, y);
+        desenharConteudoNo(no, x, y);
     }
 
-    private void drawConnection(double x1, double y1, double x2, double y2) {
+    private void desenharConexao(double x1, double y1, double x2, double y2) {
         // Desenha as linhas que unem pais e filhos
-        Line line = new Line(x1, y1 + 26, x2, y2 - 26);
-        line.setStroke(Color.GRAY);
-        line.setStrokeWidth(2);
-        line.toBack();
-        treePane.getChildren().add(line);
+        Line linha = new Line(x1, y1 + 26, x2, y2 - 26);
+        linha.setStroke(Color.GRAY);
+        linha.setStrokeWidth(2);
+        linha.toBack();
+        painelArvore.getChildren().add(linha);
     }
 
-    private void drawNodeContent(No node, double x, double y) {
+    private void desenharConteudoNo(No no, double x, double y) {
         // Desenha o texto na tela
-        String rawChar = node.getCaracter() == null ? "" : node.getCaracter();
+        String caracterBruto = no.getCaracter() == null ? "" : no.getCaracter();
 
-        // Tratamento dos caracteres especiais
-        String charText = rawChar.replace("\n", "\\n").replace("\r", "\\r")
-                .replace("\t", "\\t").replace(" ", "space");
-        String fullLabel = charText + "\n" + node.getFrequencia();
+        // Tratamento dos caracteres especiais para exibição
+        String textoCaracter = caracterBruto.replace("\n", "\\n").replace("\r", "\\r")
+                .replace("\t", "\\t").replace(" ", "espaço");
 
-        Text text = new Text(fullLabel);
-        text.setBoundsType(TextBoundsType.VISUAL);
+        String rotuloCompleto = textoCaracter + "\n" + no.getFrequencia();
 
-        // Verifica se e espaco para estilizacao personalizada
-        if (node.isFolha() && charText.equals("space")) {
-            text.setFont(Font.font("System", FontWeight.BOLD, FontPosture.ITALIC, 13));
+        Text texto = new Text(rotuloCompleto);
+        texto.setBoundsType(TextBoundsType.VISUAL);
+
+        // Verifica se é espaço para estilização personalizada
+        if (no.isFolha() && textoCaracter.equals("espaço")) {
+            texto.setFont(Font.font("System", FontWeight.BOLD, FontPosture.ITALIC, 13));
         } else {
-            text.setFont(Font.font("System", FontWeight.BOLD, 13));
+            texto.setFont(Font.font("System", FontWeight.BOLD, 13));
         }
 
-        text.setFill(Color.WHITE);
-        text.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        texto.setFill(Color.WHITE);
+        texto.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
-        // Formato da borda
-        double fixedHeight = 52;
-        double textWidth = text.getLayoutBounds().getWidth();
-        double capsuleWidth = Math.max(fixedHeight, textWidth + 30);
+        // Formato da borda (Cápsula)
+        double alturaFixa = 52;
+        double larguraTexto = texto.getLayoutBounds().getWidth();
+        double larguraCapsula = Math.max(alturaFixa, larguraTexto + 30);
 
         // Desenha a borda
-        Rectangle capsule = new Rectangle();
-        capsule.setWidth(capsuleWidth);
-        capsule.setHeight(fixedHeight);
-        capsule.setArcWidth(fixedHeight);
-        capsule.setArcHeight(fixedHeight);
-        capsule.setX(x - (capsuleWidth / 2));
-        capsule.setY(y - (fixedHeight / 2));
+        Rectangle capsula = new Rectangle();
+        capsula.setWidth(larguraCapsula);
+        capsula.setHeight(alturaFixa);
+        capsula.setArcWidth(alturaFixa);
+        capsula.setArcHeight(alturaFixa);
+        capsula.setX(x - (larguraCapsula / 2));
+        capsula.setY(y - (alturaFixa / 2));
 
-        capsule.setFill(node.isFolha() ? Color.web("#e74c3c") : Color.web("#34495e"));
-        capsule.setStroke(Color.BLACK);
-        capsule.setStrokeWidth(2);
+        // Vermelho para folhas, Azul escuro para nós internos
+        capsula.setFill(no.isFolha() ? Color.web("#e74c3c") : Color.web("#34495e"));
+        capsula.setStroke(Color.BLACK);
+        capsula.setStrokeWidth(2);
 
-        text.setX(x - (textWidth / 2));
-        text.setY(y + text.getLayoutBounds().getHeight() / 10);
+        texto.setX(x - (larguraTexto / 2));
+        texto.setY(y + texto.getLayoutBounds().getHeight() / 10);
 
-        treePane.getChildren().addAll(capsule, text);
+        painelArvore.getChildren().addAll(capsula, texto);
     }
 
-    private void calculatePositions(No node, Map<No, Double> xPositions, AtomicInteger leafIndex, double spacing) {
-        // Calcula a distancia entre os nos para que a visualizacao fique correta
-        // sem sobreposicao de nos
+    private void calcularPosicoes(No no, Map<No, Double> posicoesX, AtomicInteger indiceFolha, double espacamento) {
+        // Calcula a distancia entre os nós para que a visualização fique correta
+        // sem sobreposição de nós
 
-        if (node == null) return;
+        if (no == null) return;
 
-        if (node.isFolha()) {
-            double x = leafIndex.getAndIncrement() * spacing;
-            xPositions.put(node, x);
+        if (no.isFolha()) {
+            double x = indiceFolha.getAndIncrement() * espacamento;
+            posicoesX.put(no, x);
         } else {
             // Recursividade para os nós filhos
-            calculatePositions(node.getFilhoEsquerdo(), xPositions, leafIndex, spacing);
-            calculatePositions(node.getFilhoDireito(), xPositions, leafIndex, spacing);
+            calcularPosicoes(no.getFilhoEsquerdo(), posicoesX, indiceFolha, espacamento);
+            calcularPosicoes(no.getFilhoDireito(), posicoesX, indiceFolha, espacamento);
 
-            double leftX = xPositions.getOrDefault(node.getFilhoEsquerdo(), 0.0);
-            double rightX = xPositions.containsKey(node.getFilhoDireito()) ?
-                    xPositions.get(node.getFilhoDireito()) : leftX;
+            double esquerdaX = posicoesX.getOrDefault(no.getFilhoEsquerdo(), 0.0);
 
-            xPositions.put(node, (leftX + rightX) / 2.0);
+            // Se tiver filho direito, pega a posição, senão usa a do esquerdo (caso raro em Huffman mas bom prevenir)
+            double direitaX = posicoesX.containsKey(no.getFilhoDireito()) ?
+                    posicoesX.get(no.getFilhoDireito()) : esquerdaX;
+
+            posicoesX.put(no, (esquerdaX + direitaX) / 2.0);
         }
     }
 }

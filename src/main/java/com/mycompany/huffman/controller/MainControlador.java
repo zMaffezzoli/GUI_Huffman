@@ -2,162 +2,160 @@ package com.mycompany.huffman.controller;
 
 import com.mycompany.huffman.model.Compressor;
 import com.mycompany.huffman.model.LinhaTabela;
-
 import com.mycompany.huffman.util.*;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import javafx.fxml.FXML;
-
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-
 import javafx.stage.FileChooser;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 public class MainControlador {
-    @FXML private TabPane inputTabPane;
-    @FXML private Tab tabText;
-    @FXML private TextArea inputArea;
-    @FXML private Label fileLabel;
 
-    @FXML private TableView<LinhaTabela> freqTable;
-    @FXML private TableColumn<LinhaTabela, String> colSymbolFreq;
-    @FXML private TableColumn<LinhaTabela, Integer> colFreq;
+    // Componentes da Interface
+    @FXML private TabPane painelAbasEntrada;
+    @FXML private Tab abaTexto;
+    @FXML private TextArea areaTexto;
+    @FXML private Label rotuloArquivo;
 
-    @FXML private TableView<LinhaTabela> codeTable;
-    @FXML private TableColumn<LinhaTabela, String> colSymbolCode;
-    @FXML private TableColumn<LinhaTabela, String> colCode;
+    @FXML private TableView<LinhaTabela> tabelaFreq;
+    @FXML private TableColumn<LinhaTabela, String> colSimboloFreq;
+    @FXML private TableColumn<LinhaTabela, Integer> colFrequencia;
 
-    @FXML private TextArea binaryOutput;
+    @FXML private TableView<LinhaTabela> tabelaCodigos;
+    @FXML private TableColumn<LinhaTabela, String> colSimboloCodigo;
+    @FXML private TableColumn<LinhaTabela, String> colCodigo;
 
-    @FXML private StackPane treeViewport;
-    @FXML private Pane treePane;
+    @FXML private TextArea saidaBinaria;
 
-    private File selectedFile;
-    private VisualizadorArvore treeVisualizer;
+    @FXML private StackPane viewportArvore;
+    @FXML private Pane painelArvore;
+
+    // Variáveis de controle
+    private File arquivoSelecionado;
+    private VisualizadorArvore visualizadorArvore;
 
     @FXML
     public void initialize() {
-        setupTables();
+        configurarTabelas();
         // Inicializa o visualizador passando os componentes da GUI necessários
-        this.treeVisualizer = new VisualizadorArvore(treePane, treeViewport);
+        this.visualizadorArvore = new VisualizadorArvore(painelArvore, viewportArvore);
     }
 
-    private void setupTables() {
+    private void configurarTabelas() {
         // Tabela frequencia
-        colSymbolFreq.setCellValueFactory(new PropertyValueFactory<>("symbol"));
-        colFreq.setCellValueFactory(new PropertyValueFactory<>("frequency"));
+        colSimboloFreq.setCellValueFactory(new PropertyValueFactory<>("symbol"));
+        colFrequencia.setCellValueFactory(new PropertyValueFactory<>("frequency"));
 
         // Tabela codigo gerado
-        colSymbolCode.setCellValueFactory(new PropertyValueFactory<>("symbol"));
-        colCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+        colSimboloCodigo.setCellValueFactory(new PropertyValueFactory<>("symbol"));
+        colCodigo.setCellValueFactory(new PropertyValueFactory<>("code"));
 
-        // Usa a classe para estilizar e organizar as células da linhas das tabelas
-        FormatacaoTabela.configurarColunasSimbolo(colSymbolFreq, colSymbolCode);
+        // Usa a classe para estilizar e organizar as células das linhas das tabelas
+        FormatacaoTabela.configurarColunasSimbolo(colSimboloFreq, colSimboloCodigo);
 
-        freqTable.setSelectionModel(null);
-        codeTable.setSelectionModel(null);
+        tabelaFreq.setSelectionModel(null);
+        tabelaCodigos.setSelectionModel(null);
     }
 
     @FXML
-    private void handleClearText() {
-        inputArea.clear();
-        inputArea.requestFocus();
+    private void acaoLimparTexto() {
+        areaTexto.clear();
+        areaTexto.requestFocus();
     }
 
     @FXML
-    private void handlePasteExample() {
-        inputArea.setText("BANANA");
+    private void acaoColarExemplo() {
+        areaTexto.setText("BANANA");
     }
 
     @FXML
-    private void handleSelectFile() {
-        // Escreve o nome do arquivo do arquivo selecionado
-        FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Texto", "*.txt"));
-        selectedFile = fc.showOpenDialog(null);
-        if (selectedFile != null) fileLabel.setText(selectedFile.getName());
+    private void acaoSelecionarArquivo() {
+        // Escreve o nome do arquivo selecionado
+        FileChooser seletorArquivo = new FileChooser();
+        seletorArquivo.getExtensionFilters().add(new FileChooser.ExtensionFilter("Texto", "*.txt"));
+
+        arquivoSelecionado = seletorArquivo.showOpenDialog(null);
+        if (arquivoSelecionado != null) rotuloArquivo.setText(arquivoSelecionado.getName());
     }
 
     @FXML
-    private void handleProcess() {
-        // Classe principal para executar tudo no front (receb o onAction)
+    private void acaoProcessar() {
+        // Classe principal para executar tudo no front (recebe o onAction)
 
         // Trata possiveis erros de leitura do arquivo
         try {
-            String text = obterTextoEntrada();
+            String texto = obterTextoEntrada();
 
-            if (text == null || text.isEmpty()) {
-                binaryOutput.setText("Por favor, insira um texto ou selecione um arquivo que não esteja vazio.");
+            if (texto == null || texto.isEmpty()) {
+                saidaBinaria.setText("Por favor, insira um texto ou selecione um arquivo que não esteja vazio.");
                 return;
             }
 
             // Caso o arquivo não seja vazio, instancia as classes do algoritmo
-            Compressor compressor = new Compressor(text);
-            binaryOutput.setText(compressor.getBinario());
+            Compressor compressor = new Compressor(texto);
+            saidaBinaria.setText(compressor.getBinario());
 
             atualizarTabelas(compressor);
 
-            // Passamos a arvore gerada para a classe especializada para desenha-la
+            // Passamos a arvore gerada para a classe especializada para desenhá-la
             if (compressor.getArvore() != null) {
-                treeVisualizer.drawTree(compressor.getArvore().getRaiz());
+                visualizadorArvore.desenharArvore(compressor.getArvore().getRaiz());
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            binaryOutput.setText("Erro: " + e.getMessage());
+            saidaBinaria.setText("Erro: " + e.getMessage());
         }
     }
 
     // Retorna o texto recebido (seja ele do textarea ou do arquivo)
     private String obterTextoEntrada() throws IOException {
-        String text = "";
-        if (inputTabPane.getSelectionModel().getSelectedItem() == tabText) {
+        String texto = "";
+        if (painelAbasEntrada.getSelectionModel().getSelectedItem() == abaTexto) {
             // Para solidificar o código
-            Leitor reader = new LeitorString(inputArea.getText());
+            Leitor leitor = new LeitorString(areaTexto.getText());
 
             // Conteudo do textarea
-            text = reader.readContent();
+            texto = leitor.readContent();
 
-        } else if (selectedFile != null) {
-            Leitor reader = new LeitorArquivo(selectedFile);
+        } else if (arquivoSelecionado != null) {
+            Leitor leitor = new LeitorArquivo(arquivoSelecionado);
 
             // Conteudo do arquivo
-            text = reader.readContent();
-            if (text != null) text = text.replaceAll("[\\r\\n]+$", "");
+            texto = leitor.readContent();
+            if (texto != null) texto = texto.replaceAll("[\\r\\n]+$", "");
         }
-        return text;
+        return texto;
     }
 
     private void atualizarTabelas(Compressor compressor) {
-        ObservableList<LinhaTabela> tableData = FXCollections.observableArrayList();
-        Map<Character, Integer> freqMap = compressor.getTabelaFrequencia().getTabela();
-        Map<String, String> binaryMap = compressor.getTabelaBinaria().getTabela();
+        ObservableList<LinhaTabela> dadosTabela = FXCollections.observableArrayList();
+        Map<Character, Integer> mapaFreq = compressor.getTabelaFrequencia().getTabela();
+        Map<String, String> mapaBinario = compressor.getTabelaBinaria().getTabela();
 
-        // entry.getKey é comumm das duas tabelas (o caracter em si)
-        for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {
+        // entry.getKey é comum das duas tabelas (o caracter em si)
+        for (Map.Entry<Character, Integer> entrada : mapaFreq.entrySet()) {
             // Tratamento dos caracteres especiais na visualização das tabelas
-            String symbol = String.valueOf(entry.getKey())
+            String simbolo = String.valueOf(entrada.getKey())
                     .replace("\n", "\\n").replace("\r", "\\r")
-                    .replace("\t", "\\t").replace(" ", "space");
+                    .replace("\t", "\\t").replace(" ", "space"); // Mantive "space" pois FormatacaoTabela verifica "space"
 
-            tableData.add(new LinhaTabela(symbol, entry.getValue(), binaryMap.get(String.valueOf(entry.getKey()))));
+            dadosTabela.add(new LinhaTabela(simbolo, entrada.getValue(), mapaBinario.get(String.valueOf(entrada.getKey()))));
         }
 
         // Ordena as tabelas pela frequencia dos caracteres
-        tableData.sort((r1, r2) -> {
-            int freqCompare = Integer.compare(r2.getFrequency(), r1.getFrequency());
-            return (freqCompare != 0) ? freqCompare : r1.getSymbol().compareTo(r2.getSymbol());
+        dadosTabela.sort((r1, r2) -> {
+            int comparacaoFreq = Integer.compare(r2.getFrequency(), r1.getFrequency());
+            return (comparacaoFreq != 0) ? comparacaoFreq : r1.getSymbol().compareTo(r2.getSymbol());
         });
 
-        freqTable.setItems(tableData);
-        codeTable.setItems(tableData);
+        tabelaFreq.setItems(dadosTabela);
+        tabelaCodigos.setItems(dadosTabela);
     }
 }

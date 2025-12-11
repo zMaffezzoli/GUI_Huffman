@@ -11,75 +11,67 @@
 
             <Label text="Compressor de Huffman" styleClass="app-title"/>
 
-            <TabPane fx:id="inputTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="input-tab-pane">
-
+            <TabPane fx:id="painelAbasEntrada" tabClosingPolicy="UNAVAILABLE" styleClass="input-tab-pane">
                 <!-- Quadrado para escrever -->
-                <Tab fx:id="tabText" text="Digitar Texto">
+                <Tab fx:id="abaTexto" text="Digitar Texto">
                     <VBox styleClass="tab-content">
-                        <TextArea fx:id="inputArea" promptText="Digite o texto aqui..." wrapText="true" styleClass="input-text-area"/>
+                        <TextArea fx:id="areaTexto" promptText="Digite o texto aqui..." wrapText="true" styleClass="input-text-area"/>
                         <HBox styleClass="button-bar">
-                            <Button text="Colocar Exemplo" onAction="#handlePasteExample" styleClass="btn-secondary"/>
-                            <Button text="Limpar Texto" onAction="#handleClearText" styleClass="btn-danger"/>
+                            <Button text="Colocar Exemplo" onAction="#acaoColarExemplo" styleClass="btn-secondary"/>
+                            <Button text="Limpar Texto" onAction="#acaoLimparTexto" styleClass="btn-danger"/>
                         </HBox>
                     </VBox>
                 </Tab>
-
                 <!-- Área para carregar arquivo -->
-                <Tab fx:id="tabFile" text="Carregar Arquivo">
+                <Tab text="Carregar Arquivo">
                     <HBox styleClass="tab-content-file">
-                        <Button text="Selecionar Arquivo .txt" onAction="#handleSelectFile" styleClass="btn-secondary"/>
-                        <Label fx:id="fileLabel" text="Nenhum arquivo selecionado" styleClass="label-placeholder"/>
+                        <Button text="Selecionar Arquivo .txt" onAction="#acaoSelecionarArquivo" styleClass="btn-secondary"/>
+                        <Label fx:id="rotuloArquivo" text="Nenhum arquivo selecionado" styleClass="label-placeholder"/>
                     </HBox>
                 </Tab>
             </TabPane>
-
             <!-- Botão para chamar as funções -->
             <HBox styleClass="action-container">
-                <Button text="COMPRIMIR E GERAR ÁRVORE" onAction="#handleProcess" styleClass="btn-primary"/>
+                <Button text="COMPRIMIR E GERAR ÁRVORE" onAction="#acaoProcessar" styleClass="btn-primary"/>
             </HBox>
-
             <!-- Tabela frequencia -->
             <HBox styleClass="data-container">
                 <VBox styleClass="column-container" HBox.hgrow="ALWAYS">
                     <Label text="Frequências" styleClass="section-subtitle"/>
-                    <TableView fx:id="freqTable" styleClass="modern-table" VBox.vgrow="ALWAYS">
+                    <TableView fx:id="tabelaFreq" styleClass="modern-table" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colSymbolFreq" text="Símbolo"/>
-                            <TableColumn fx:id="colFreq" text="Qtd"/>
+                            <TableColumn fx:id="colSimboloFreq" text="Símbolo"/>
+                            <TableColumn fx:id="colFrequencia" text="Qtd"/>
                         </columns>
                         <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                     </TableView>
                 </VBox>
-
                 <!-- Tabela codigos -->
                 <VBox styleClass="column-container" HBox.hgrow="ALWAYS">
                     <Label text="Códigos Gerados" styleClass="section-subtitle"/>
-                    <TableView fx:id="codeTable" styleClass="modern-table" VBox.vgrow="ALWAYS">
+                    <TableView fx:id="tabelaCodigos" styleClass="modern-table" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colSymbolCode" text="Símbolo"/>
-                            <TableColumn fx:id="colCode" text="Binário"/>
+                            <TableColumn fx:id="colSimboloCodigo" text="Símbolo"/>
+                            <TableColumn fx:id="colCodigo" text="Binário"/>
                         </columns>
                         <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                     </TableView>
                 </VBox>
 
-
                 <VBox styleClass="column-container" HBox.hgrow="ALWAYS">
                     <Label text="Resultado Final" styleClass="section-subtitle"/>
-                    <TextArea fx:id="binaryOutput" editable="false" wrapText="true" styleClass="output-area" VBox.vgrow="ALWAYS"/>
+                    <TextArea fx:id="saidaBinaria" editable="false" wrapText="true" styleClass="output-area" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </HBox>
-
             <!-- Textos adicionais -->
             <VBox styleClass="tree-container">
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Visualização da Árvore" styleClass="section-title"/>
                     <Label text="(Arraste para mover, Ctrl + Scroll para zoom)" style="-fx-font-size: 11px; -fx-text-fill: #95a5a6;"/>
                 </HBox>
-
                 <!-- Onde desenha a árvore -->
-                <StackPane fx:id="treeViewport" styleClass="tree-viewport">
-                    <Pane fx:id="treePane" styleClass="tree-canvas"/>
+                <StackPane fx:id="viewportArvore" styleClass="tree-viewport">
+                    <Pane fx:id="painelArvore" styleClass="tree-canvas"/>
                 </StackPane>
             </VBox>
 
