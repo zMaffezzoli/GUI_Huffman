@@ -158,8 +158,8 @@ public class MainControlador {
 
         // Ordena as tabelas pela frequencia dos caracteres
         dadosTabela.sort((r1, r2) -> {
-            int comparacaoFreq = Integer.compare(r2.getFrequency(), r1.getFrequency());
-            return (comparacaoFreq != 0) ? comparacaoFreq : r1.getSymbol().compareTo(r2.getSymbol());
+            int comparacaoFreq = Integer.compare(r2.getFrequencia(), r1.getFrequencia());
+            return (comparacaoFreq != 0) ? comparacaoFreq : r1.getCaracter().compareTo(r2.getCaracter());
         });
 
         tabelaFreq.setItems(dadosTabela);

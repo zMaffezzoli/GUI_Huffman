@@ -50,7 +50,7 @@ public class No implements Comparable<No>{
         this.caracter = filhoEsquerdo.caracter + "+" + filhoDireito.caracter;
     }
 
-    // Checa se é uma folha (Metodo somente para visualização teste)
+    // Checa se é uma folha
     public boolean isFolha() {
         return this.filhoDireito == null && this.filhoEsquerdo == null;
     }

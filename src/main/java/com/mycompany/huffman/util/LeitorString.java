@@ -1,14 +1,14 @@
 package com.mycompany.huffman.util;
 
 public class LeitorString extends Leitor {
-    private final String content;
+    private final String conteudo;
 
-    public LeitorString(String content) {
-        this.content = content;
+    public LeitorString(String conteudo) {
+        this.conteudo = conteudo;
     }
 
     @Override
     public String lerConteudo() {
-        return content;
+        return conteudo;
     }
 }

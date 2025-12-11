@@ -1,17 +1,17 @@
 package com.mycompany.huffman.model;
 
 public class LinhaTabela {
-    private String symbol;
-    private int frequency;
-    private String code;
+    private String caracter;
+    private int frequencia;
+    private String codigo;
 
-    public String getSymbol() { return symbol; }
-    public int getFrequency() { return frequency; }
-    public String getCode() { return code; }
+    public String getCaracter() { return caracter; }
+    public int getFrequencia() { return frequencia; }
+    public String getCodigo() { return codigo; }
 
-    public LinhaTabela(String symbol, int frequency, String code) {
-        this.symbol = symbol;
-        this.frequency = frequency;
-        this.code = code;
+    public LinhaTabela(String simbolo, int frequencia, String codigo) {
+        this.caracter = simbolo;
+        this.frequencia = frequencia;
+        this.codigo = codigo;
     }
 }
