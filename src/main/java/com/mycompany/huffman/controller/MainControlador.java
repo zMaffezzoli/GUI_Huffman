@@ -56,12 +56,12 @@ public class MainControlador {
 
     private void configurarTabelas() {
         // Tabela frequencia
-        colSimboloFreq.setCellValueFactory(new PropertyValueFactory<>("symbol"));
-        colFrequencia.setCellValueFactory(new PropertyValueFactory<>("frequency"));
+        colSimboloFreq.setCellValueFactory(new PropertyValueFactory<>("caracter"));
+        colFrequencia.setCellValueFactory(new PropertyValueFactory<>("frequencia"));
 
         // Tabela codigo gerado
-        colSimboloCodigo.setCellValueFactory(new PropertyValueFactory<>("symbol"));
-        colCodigo.setCellValueFactory(new PropertyValueFactory<>("code"));
+        colSimboloCodigo.setCellValueFactory(new PropertyValueFactory<>("caracter"));
+        colCodigo.setCellValueFactory(new PropertyValueFactory<>("codigo"));
 
         // Usa a classe para estilizar e organizar as células das linhas das tabelas
         FormatacaoTabela.configurarColunasSimbolo(colSimboloFreq, colSimboloCodigo);
